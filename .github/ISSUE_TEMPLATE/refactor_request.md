@@ -1,6 +1,6 @@
 ---
-name: 🛠️ 리팩토링 요청
-about: 코드 구조 개선, 성능 향상, 불필요한 코드 제거 등
+name: "refactor: 🛠️ 리팩토링 요청"
+about: "코드 구조 개선, 성능 향상, 불필요한 코드 제거 등"
 title: "refactor: "
 labels: ["Refactor"]
 assignees: []

@@ -1,5 +1,5 @@
 ---
-name: "❌ 무효 이슈"
+name: "invalid: ❌ 무효 이슈"
 about: "잘못 작성되었거나 중복된 이슈입니다."
 title: "invalid: "
 labels: ["Invalid"]

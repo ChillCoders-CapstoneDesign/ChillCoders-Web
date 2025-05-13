@@ -1,6 +1,6 @@
 ---
-name: ✨ 기능 추가 요청
-about: 새로운 기능을 구현해야 할 때 사용하는 이슈 템플릿
+name: "feat: ✨ 기능 추가 요청"
+about: "새로운 기능을 구현해야 할 때 사용하는 이슈 템플릿"
 title: "feat: "
 labels: ["Feature"]
 assignees: []

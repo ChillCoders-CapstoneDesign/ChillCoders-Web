@@ -1,6 +1,6 @@
 ---
-name: 🐛 버그 리포트
-about: 발견한 문제나 예상과 다른 동작을 기록할 때
+name: "fix: 🐛 버그 리포트"
+about: "발견한 문제나 예상과 다른 동작을 기록할 때"
 title: "fix: "
 labels: ["BugFix"]
 assignees: []

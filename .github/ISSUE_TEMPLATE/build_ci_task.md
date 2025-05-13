@@ -1,5 +1,5 @@
 ---
-name: "🏗 빌드/CI 작업"
+name: "build: 🏗 빌드/CI 작업"
 about: "빌드 시스템, CI/CD 파이프라인, 배포 스크립트 관련 작업"
 title: "build: "
 labels: ["Build"]

@@ -1,5 +1,5 @@
 ---
-name: "🎨 UI 개선"
+name: "design: 🎨 UI 개선"
 about: "CSS, 폰트, 아이콘 등 시각적 개선을 위한 템플릿"
 title: "design: "
 labels: ["UI"]

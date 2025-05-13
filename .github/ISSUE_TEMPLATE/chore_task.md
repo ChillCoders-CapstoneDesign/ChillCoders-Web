@@ -1,5 +1,5 @@
 ---
-name: "🧹 코드 정리"
+name: "chore: 🧹 코드 정리"
 about: "사소한 코드 수정이나 종속성 업데이트 등 비기능 작업"
 title: "chore: "
 labels: ["Chore"]
