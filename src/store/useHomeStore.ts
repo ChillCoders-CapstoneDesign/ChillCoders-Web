@@ -1,7 +1,8 @@
 // src/store/useHomeStore.ts
 import { create } from 'zustand';
+import { mockServices } from '@/constants/mockServices'; // ✅ 이 줄 추가
 
-type Service = {
+export type Service = {
     id: number;
     name: string;
     price: string;
@@ -9,6 +10,7 @@ type Service = {
     dday: string;
     logoUrl: string;
     period: string;
+    category: string;
 };
 
 type HomeState = {
@@ -25,6 +27,7 @@ type HomeState = {
     fetchHomeData: () => Promise<void>; // 👈 추가
 };
 
+
 export const useHomeStore = create<HomeState>((set, get) => ({
     selectedCategory: '전체보기',
     setSelectedCategory: (category) => set({ selectedCategory: category }),
@@ -36,26 +39,23 @@ export const useHomeStore = create<HomeState>((set, get) => ({
     services: [],
     setServices: (services) => set({ services }),
 
+    // ✅ 여기 부분 교체!
     fetchHomeData: async () => {
         const category = get().selectedCategory;
-        try {
-            const res = await fetch(`/api/home?category=${category}`);
-            const data = await res.json();
-
-            // 예시: 백엔드에서 이런 형태로 준다고 가정
-            // {
-            //   monthlyCost: 96400,
-            //   yearlyCost: 1069200,
-            //   services: [ ... ]
-            // }
-
-            set({
-                monthlyCost: data.monthlyCost,
-                yearlyCost: data.yearlyCost,
-                services: data.services,
-            });
-        } catch (err) {
-            console.error('홈 데이터 fetch 실패:', err);
-        }
-    },
+    
+        const filtered = category === '전체보기'
+            ? mockServices
+            : mockServices.filter(service => service.category === category); // ✅ 수정
+    
+        const totalMonthly = filtered.reduce((sum, s) => {
+            const price = parseInt(s.price.replace(/[^0-9]/g, ''), 10);
+            return sum + (s.billingType === '1년' ? price / 12 : price);
+        }, 0);
+    
+        set({
+            services: filtered,
+            monthlyCost: totalMonthly,
+            yearlyCost: totalMonthly * 12,
+        });
+    }
 }));
