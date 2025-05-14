@@ -32,6 +32,4 @@ const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%; /* 💥 이거 추가 */
-    gap: 1rem; /* 필요시 컴포넌트 간 간격 */
 `;
