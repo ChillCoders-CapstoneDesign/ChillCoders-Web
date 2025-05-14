@@ -15,7 +15,7 @@ export default function RegisterDonePage() {
     };
 
     const handleGoToInput = () => {
-        router.push('/register/edit');
+        router.push('/edit');
     };
 
     return (

@@ -6,6 +6,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { COLORS, TEXT_COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/font';
 import { useHomeStore } from '@/store/useHomeStore';
+import { useRouter } from 'next/navigation'; // 시연용 추가
 
 interface Props {
     service: {
@@ -24,6 +25,7 @@ const ListComponent = ({ service }: Props) => {
     const touchStartX = useRef(0);
     const mouseStartX = useRef(0);
     const { setServices, services, setCosts } = useHomeStore();
+    const router = useRouter(); // 시연용 추가
 
     // 터치 이벤트
     const handleTouchStart = (e: React.TouchEvent) => {
@@ -66,20 +68,62 @@ const ListComponent = ({ service }: Props) => {
         setCosts(totalMonthly, totalMonthly * 12);
     };
 
+
+    // ============================
+    // 🌟 [중간시연용 코드 시작]
+    const handleClick = () => {
+        if (!showDelete) {
+            router.push('/edit');
+        }
+    };
+    // 🌟 [중간시연용 코드 끝]
+    // ============================
+
     return (
         <Container>
             <SwipeWrapper>
                 <Content
                     $showDelete={showDelete}
+                    onClick={handleClick} // 🌟 [중간시연용]
                     onTouchStart={handleTouchStart}
                     onTouchEnd={handleTouchEnd}
                     onMouseDown={handleMouseDown}
                     onMouseUp={handleMouseUp}
-                >
+                >   
+                    {/*}
                     <Logo
                         src={service.logoUrl || '/images/gray-circle.png'}
                         alt={service.name}
-                    />
+                    /> 
+                    */}
+                    {/* 🌟 [중간시연용 코드 시작: 로고 클릭 시 넷플릭스 로그인 페이지로 이동] */}
+                    <a
+                        href={
+                            service.name.toLowerCase() === 'netflix premium'
+                                ? 'https://www.netflix.com/login'
+                                : undefined
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => {
+                            if (service.name.toLowerCase() === 'netflix premium') {
+                                e.stopPropagation(); // 카드 클릭(router.push('/edit')) 방지
+                            }
+                        }}
+                    >
+                        <Logo
+                            src={
+                                service.logoUrl ||
+                                `/images/${service.name
+                                    .toLowerCase()
+                                    .replace(/\s/g, '_')
+                                    .replace('+', 'plus')
+                                    .replace('.', '')}.png`
+                            }
+                            alt={service.name}
+                        />
+                    </a>
+                    {/* 🌟 [중간시연용 코드 끝] */}
                     <TextBox>
                         <ServiceName>{service.name}</ServiceName>
                         <ServicePrice>
@@ -126,6 +170,9 @@ const Content = styled.div<{ $showDelete: boolean }>`
     padding: 1rem;
     transform: ${({ $showDelete }) => ($showDelete ? 'translateX(-4rem)' : 'translateX(0)')};
     transition: transform 0.3s ease;
+
+    /* 🌟 [중간시연용] 커서 스타일 이건 시연 끝나고도 놔둬도 될듯 */
+    cursor: ${({ $showDelete }) => ($showDelete ? 'default' : 'pointer')};
 `;
 
 const Logo = styled.img`
