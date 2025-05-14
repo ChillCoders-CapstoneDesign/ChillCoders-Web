@@ -5,7 +5,7 @@ feat: ~~(#issueNum)
 
 ## 📌 관련 이슈
 
-- closed: #issueNum
+- closes: #issueNum
 
 ## ✨ PR 세부 내용
 
