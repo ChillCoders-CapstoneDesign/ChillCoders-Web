@@ -1,70 +1,69 @@
+'use client';
+
 import styled from 'styled-components';
 import { useHomeStore } from '../../../../store/useHomeStore';
-import { TEXT_COLORS, COLORS } from '@/constants/colors';
+import { useState } from 'react';
+import ListComponent from './ListComponent';
+import { TEXT_COLORS } from '@/constants/colors';
+import { FONTS } from '@/constants/font';
 
 const List = () => {
     const { services } = useHomeStore();
+    const [sortBy, setSortBy] = useState<'date' | 'price'>('date');
+
+    const sortedServices = [...services].sort((a, b) => {
+        if (sortBy === 'date') {
+            return Number(a.dday) - Number(b.dday);
+        } else {
+            return parseFloat(b.price.replace(/[^\d.-]+/g, '')) - parseFloat(a.price.replace(/[^\d.-]+/g, ''));
+        }
+    });
 
     return (
-        <ListContainer>
-            {services.map((service) => (
-                <Item key={service.id}>
-                    <Logo src={service.logoUrl} alt={service.name} />
-                    <TextBox>
-                        <ServiceName>{service.name}</ServiceName>
-                        <ServicePrice>{service.price} / {service.period}</ServicePrice>
-                    </TextBox>
-                    <Dday>D-{service.dday}</Dday>
-                </Item>
-            ))}
-        </ListContainer>
+        <Wrapper>
+            <Header>
+                <Title>내 구독 개수 : {services.length} 개</Title>
+                <Select onChange={(e) => setSortBy(e.target.value as 'date' | 'price')}>
+                    <option value="date">결제일</option>
+                    <option value="price">가격순</option>
+                </Select>
+            </Header>
+            <ServiceList>
+                {sortedServices.map(service => (
+                    <ListComponent key={service.id} service={service} />
+                ))}
+            </ServiceList>
+        </Wrapper>
     );
 };
 
 export default List;
 
-const ListContainer = styled.div`
+const Wrapper = styled.div`
+    width: 100%;
+    padding: 1rem;
+`;
+
+const Header = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+`;
+
+const Title = styled.div`
+    font-family: ${FONTS.PRETENDARD[700]};
+    color: ${TEXT_COLORS.black};
+`;
+
+const Select = styled.select`
+    padding: 0.4rem;
+    border-radius: 0.25rem;
+    border: 1px solid #ccc;
+`;
+
+const ServiceList = styled.div`
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 `;
-
-const Item = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #fff;
-    border-radius: 12px;
-    padding: 1rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-`;
-
-const Logo = styled.img`
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-`;
-
-const TextBox = styled.div`
-    flex: 1;
-    margin-left: 1rem;
-`;
-
-const ServiceName = styled.div`
-    font-weight: bold;
-`;
-
-const ServicePrice = styled.div`
-    font-size: 0.875rem;
-    color: #666;
-`;
-
-const Dday = styled.div`
-    background-color: ${COLORS.main};
-    color: #fff;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: bold;
-`;
-
-// layout은 이미 StyledLayout.tsx 로 쓰고 있으니 별도 작성은 불필요
