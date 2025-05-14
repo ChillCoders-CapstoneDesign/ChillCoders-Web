@@ -23,7 +23,7 @@ const ListComponent = ({ service }: Props) => {
     const [showDelete, setShowDelete] = useState(false);
     const touchStartX = useRef(0);
     const mouseStartX = useRef(0);
-    const { setServices, services } = useHomeStore();
+    const { setServices, services, setCosts } = useHomeStore();
 
     // 터치 이벤트
     const handleTouchStart = (e: React.TouchEvent) => {
@@ -54,7 +54,16 @@ const ListComponent = ({ service }: Props) => {
     };
 
     const handleDelete = () => {
-        setServices(services.filter((s) => s.id !== service.id));
+        const updated = services.filter((s) => s.id !== service.id);
+        setServices(updated);
+    
+        // 가격 재계산
+        const totalMonthly = updated.reduce((sum, s) => {
+            const price = parseInt(s.price.replace(/[^0-9]/g, ''), 10);
+            return sum + (s.billingType === '1년' ? price / 12 : price);
+        }, 0);
+    
+        setCosts(totalMonthly, totalMonthly * 12);
     };
 
     return (
