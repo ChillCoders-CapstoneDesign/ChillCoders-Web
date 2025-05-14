@@ -33,14 +33,21 @@ const BottomTab = ({ currentPath }: BottomTabProps) => {
 export default BottomTab;
 
 const TabWrapper = styled.div`
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px; /* ✅ 폰 크기 고정 */
+    height: 6rem;
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
     display: flex;
     justify-content: space-around;
     align-items: center;
-    height: 6rem;
     background-color: white;
     border-top: 1px solid #eee;
+    z-index: 1000;
 `;
 
 

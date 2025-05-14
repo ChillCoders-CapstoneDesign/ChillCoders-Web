@@ -54,7 +54,7 @@ export const mockServices: Service[] = [
         dday: '5',
         logoUrl: '',
         period: '1달',
-        category: '툴'
+        category: 'AI'
     },
     {
         id: 6,
@@ -65,5 +65,15 @@ export const mockServices: Service[] = [
         logoUrl: '',
         period: '1년',
         category: '툴'
+    },
+    {
+        id: 7,
+        name: 'Claude',
+        price: '$16.67 USD',
+        billingType: '1달',
+        dday: '10',
+        logoUrl: '',
+        period: '1달',
+        category: 'AI',
     }
 ];

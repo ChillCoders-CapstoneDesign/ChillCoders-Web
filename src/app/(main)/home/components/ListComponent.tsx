@@ -155,7 +155,9 @@ const ServicePrice = styled.div`
 const Dday = styled.div`
     background-color: ${COLORS.main};
     color: #fff;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0;          // 좌우 패딩 제거
+    width: 4.5rem;              // 고정 너비 설정 (3자리 숫자 + 여백 감안)
+    text-align: center;         // 가운데 정렬
     border-radius: 20px;
     font-weight: bold;
 `;
