@@ -32,48 +32,41 @@ export const useHomeStore = create<HomeState>((set, get) => ({
         try {
             const category = get().selectedCategory;
 
-            // ✅ 백엔드에서 /subscribe/list API 호출
-            const { data } = await axios.get<{
-                totalCount: number;
-                monthlyTotalPrice: number;
-                yearlyTotalPrice: number;
-                subscribeList: SubscribeData[];
-            }>('/subscribe/list');
+            // 🔀 API 경로 분기
+            const url = category === '전체보기'
+                ? '/subscribe/list'
+                : `/subscribe/list/category/${categoryToNo(category)}`;
 
-            // ✅ raw data → Service 타입으로 파싱
+            const { data } = await axios.get<{
+                subscribeList: SubscribeData[];
+            }>(url);
+
             const parsed: Service[] = data.subscribeList.map((item, index) => ({
                 id: item.subscribeNo || index,
                 name: item.subscribeName,
-                price: item.price.toLocaleString(), // 쉼표 있는 문자열로 변환
-                billingType: item.periodUnit,       // '월' 또는 '년'
+                price: item.price.toLocaleString(),
+                billingType: item.periodUnit,
                 dday: item.dday?.toString() || '0',
                 logoUrl: item.image || '',
                 period: `${item.period} ${item.periodUnit}`,
                 category: item.categoryNo?.toString() || '기타',
             }));
 
-            // ✅ 카테고리 필터링 (예: 음악, OTT 등)
-            const filtered = category === '전체보기'
-                ? parsed
-                : parsed.filter((service) => service.category === category);
+            const monthlyOnly = parsed.filter(s => s.billingType === '달');
+            const yearlyOnly = parsed.filter(s => s.billingType === '년');
 
-            // ✅ 월간 비용 계산 (billingType이 '달'인 것만)
-            const monthlyOnly = filtered.filter(s => s.billingType === '달');
             const totalMonthly = monthlyOnly.reduce((sum, s) => {
                 const price = parseInt(s.price.replace(/[^0-9]/g, ''), 10);
                 return sum + price;
             }, 0);
 
-            // ✅ 연간 비용 계산 (billingType이 '년'인 것만)
-            const yearlyOnly = filtered.filter(s => s.billingType === '년');
             const totalYearly = yearlyOnly.reduce((sum, s) => {
                 const price = parseInt(s.price.replace(/[^0-9]/g, ''), 10);
                 return sum + price;
             }, 0);
 
-            // ✅ Zustand store에 상태 저장
             set({
-                services: filtered,
+                services: parsed,
                 monthlyCost: totalMonthly,
                 yearlyCost: totalYearly,
             });
@@ -83,3 +76,16 @@ export const useHomeStore = create<HomeState>((set, get) => ({
         }
     }
 }));
+
+// 🔧 카테고리 이름 → 번호 변환 함수
+function categoryToNo(name: string): number {
+    const map: Record<string, number> = {
+        음악: 1,
+        OTT: 2,
+        툴: 3,
+        AI: 4,
+        클라우드: 5,
+        기타: 6,
+    };
+    return map[name] ?? 0;
+}
