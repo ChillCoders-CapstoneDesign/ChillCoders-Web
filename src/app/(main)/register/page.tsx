@@ -6,19 +6,24 @@ import { useRouter } from 'next/navigation';
 import { COLORS, TEXT_COLORS } from '@/constants/colors';
 import backIcon from '../../../assets/icons/back-icon.png';
 import { useState } from 'react';
+import axios from '@/api/axiosInstance';
 
-const allServices = ['넷플릭스', '왓챠', '웨이브', '티빙', 'FLO Music', 'APPLE Music'];
+interface SearchResult {
+    subscribeNo: number;
+    subscribeName: string;
+    image: string;
+}
 
 export default function RegisterPage() {
     const router = useRouter();
     const [query, setQuery] = useState('');
-    const [filtered, setFiltered] = useState<string[]>([]);
+    const [filtered, setFiltered] = useState<SearchResult[]>([]);
 
     const handleBack = () => {
         router.back();
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setQuery(value);
 
@@ -27,15 +32,16 @@ export default function RegisterPage() {
             return;
         }
 
-        const matches = allServices.filter((s) =>
-            s.toLowerCase().includes(value.toLowerCase())
-        );
-        setFiltered(matches);
+        try {
+            const response = await axios.get<SearchResult[]>(`/subscribe/search?keyword=${value}`);
+            setFiltered(response.data);
+        } catch (err) {
+            console.error('검색 실패:', err);
+        }
     };
 
-    const handleSelect = (service: string) => {
-        // 실제론 상태 저장하거나 쿼리 파라미터 넘겨야 하지만 일단 라우팅만
-        router.push('/register/done');
+    const handleSelect = (service: SearchResult) => {
+        router.push(`/register/done?name=${encodeURIComponent(service.subscribeName)}&img=${encodeURIComponent(service.image)}`);
     };
 
     return (
@@ -56,8 +62,8 @@ export default function RegisterPage() {
                 {filtered.length > 0 && (
                     <Dropdown>
                         {filtered.map((service) => (
-                            <DropdownItem key={service} onClick={() => handleSelect(service)}>
-                                {service}
+                            <DropdownItem key={service.subscribeNo} onClick={() => handleSelect(service)}>
+                                {service.subscribeName}
                             </DropdownItem>
                         ))}
                     </Dropdown>
