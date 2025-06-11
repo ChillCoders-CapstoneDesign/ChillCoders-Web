@@ -1,4 +1,4 @@
-import { Service } from '@/store/useHomeStore';
+import { Service } from '../types/service';
 
 export const mockServices: Service[] = [
     // ♫ 음악
