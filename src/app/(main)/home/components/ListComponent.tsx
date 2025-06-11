@@ -7,6 +7,7 @@ import { COLORS, TEXT_COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/font';
 import { useHomeStore } from '@/store/useHomeStore';
 import { useRouter } from 'next/navigation'; // 시연용 추가
+import axios from '@/api/axiosInstance';
 
 interface Props {
     service: {
@@ -55,19 +56,33 @@ const ListComponent = ({ service }: Props) => {
         }
     };
 
-    const handleDelete = () => {
-        const updated = services.filter((s) => s.id !== service.id);
-        setServices(updated);
-    
-        // 가격 재계산
-        const totalMonthly = updated.reduce((sum, s) => {
-            const price = parseInt(s.price.replace(/[^0-9]/g, ''), 10);
-            return sum + (s.billingType === '1년' ? price / 12 : price);
-        }, 0);
-    
-        setCosts(totalMonthly, totalMonthly * 12);
-    };
+    const handleDelete = async () => {
+        try {
+            // 1. 서버에 DELETE 요청
+            await axios.delete(`/subscribe/${service.id}`);
 
+            // 2. 상태에서 제거
+            const updated = services.filter((s) => s.id !== service.id);
+            setServices(updated);
+
+            // 3. 비용 재계산
+            const totalMonthly = updated.reduce((sum, s) => {
+                const price = parseInt(s.price.replace(/[^0-9]/g, ''), 10);
+                return sum + (s.billingType === '달' ? price : 0);
+            }, 0);
+
+            const totalYearly = updated.reduce((sum, s) => {
+                const price = parseInt(s.price.replace(/[^0-9]/g, ''), 10);
+                return sum + (s.billingType === '년' ? price : 0);
+            }, 0);
+
+            setCosts(totalMonthly, totalYearly);
+
+        } catch (err) {
+            console.error('❌ 삭제 실패:', err);
+            alert('삭제 중 오류가 발생했습니다.');
+        }
+    };
 
     // ============================
     // 🌟 [중간시연용 코드 시작]
