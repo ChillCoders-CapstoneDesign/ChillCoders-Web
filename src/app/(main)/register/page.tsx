@@ -41,7 +41,9 @@ export default function RegisterPage() {
     };
 
     const handleSelect = (service: SearchResult) => {
-        router.push(`/register/done?name=${encodeURIComponent(service.subscribeName)}&img=${encodeURIComponent(service.image)}`);
+        router.push(
+            `/register/done?name=${encodeURIComponent(service.subscribeName)}&img=${encodeURIComponent(service.image)}&subscribeNo=${service.subscribeNo}`
+        );
     };
 
     return (

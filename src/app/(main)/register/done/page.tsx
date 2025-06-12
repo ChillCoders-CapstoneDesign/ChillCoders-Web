@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { COLORS, TEXT_COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/font';
 import backIcon from '../../../../assets/icons/back-icon.png';
-import { getParticle } from '@/utils/postposition';
+import { getParticle } from '../../../../utils/postposition';
 
 export default function RegisterDonePage() {
     const router = useRouter();
@@ -19,8 +19,14 @@ export default function RegisterDonePage() {
         router.back();
     };
 
+    const subscribeNo = searchParams.get('subscribeNo'); // 추가
+
     const handleGoToInput = () => {
-        router.push('/edit');
+        if (!subscribeNo) {
+            alert('구독 번호가 없습니다');
+            return;
+        }
+        router.push(`/edit?subscribeNo=${subscribeNo}`);
     };
 
     //이거 아직 S3에 배포 안되어서 더미로 넣음
