@@ -19,6 +19,8 @@ export default function RegisterPage() {
     const [query, setQuery] = useState('');
     const [filtered, setFiltered] = useState<SearchResult[]>([]);
 
+    const [showRegisterSelf, setShowRegisterSelf] = useState(false);
+
     const handleBack = () => {
         router.back();
     };
@@ -35,6 +37,7 @@ export default function RegisterPage() {
         try {
             const response = await axios.get<SearchResult[]>(`/subscribe/search?keyword=${value}`);
             setFiltered(response.data);
+            setShowRegisterSelf(response.data.length === 0); // 검색 결과 없으면 직접 등록 활성화
         } catch (err) {
             console.error('검색 실패:', err);
         }
@@ -69,6 +72,12 @@ export default function RegisterPage() {
                             </DropdownItem>
                         ))}
                     </Dropdown>
+                )}
+
+                {showRegisterSelf && (
+                    <RegisterSelf onClick={() => router.push('/edit-firsthand')}>
+                        … 직접 등록하기
+                    </RegisterSelf>
                 )}
             </Content>
         </Container>
@@ -133,5 +142,21 @@ const DropdownItem = styled.li`
     cursor: pointer;
     &:hover {
         background-color: #f2f2f2;
+    }
+`;
+
+const RegisterSelf = styled.div`
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: ${TEXT_COLORS.default};
+    cursor: pointer;
+    background-color: #f2f2f2;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+
+    &:hover {
+        background-color: #e0e0e0;
     }
 `;

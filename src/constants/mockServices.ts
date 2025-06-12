@@ -1,3 +1,4 @@
+/*
 import { Service } from '../types/service';
 
 export const mockServices: Service[] = [
@@ -76,4 +77,4 @@ export const mockServices: Service[] = [
         period: '1달',
         category: 'AI',
     }
-];
+];*/

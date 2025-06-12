@@ -14,6 +14,7 @@ interface Props {
         id: number;
         name: string;
         price: string;
+        priceUnit: string;
         billingType: string;
         dday: string;
         logoUrl: string;
@@ -84,34 +85,24 @@ const ListComponent = ({ service }: Props) => {
         }
     };
 
-    // ============================
-    // 🌟 [중간시연용 코드 시작]
+
     const handleClick = () => {
         if (!showDelete) {
-            router.push('/edit');
+            router.push(`/edit?subscribeNo=${service.id}`);  // ✅ 서비스 ID를 쿼리로 넘김
         }
     };
-    // 🌟 [중간시연용 코드 끝]
-    // ============================
 
     return (
         <Container>
             <SwipeWrapper>
                 <Content
                     $showDelete={showDelete}
-                    onClick={handleClick} // 🌟 [중간시연용]
+                    onClick={handleClick}
                     onTouchStart={handleTouchStart}
                     onTouchEnd={handleTouchEnd}
                     onMouseDown={handleMouseDown}
                     onMouseUp={handleMouseUp}
                 >   
-                    {/*}
-                    <Logo
-                        src={service.logoUrl || '/images/gray-circle.png'}
-                        alt={service.name}
-                    /> 
-                    */}
-                    {/* 🌟 [중간시연용 코드 시작: 로고 클릭 시 넷플릭스 로그인 페이지로 이동] */}
                     <a
                         href={
                             service.name.toLowerCase() === 'netflix premium'
@@ -126,23 +117,20 @@ const ListComponent = ({ service }: Props) => {
                             }
                         }}
                     >
-                        <Logo
-                            src={
-                                service.logoUrl ||
-                                `/images/${service.name
-                                    .toLowerCase()
-                                    .replace(/\s/g, '_')
-                                    .replace('+', 'plus')
-                                    .replace('.', '')}.png`
-                            }
-                            alt={service.name}
-                        />
+                    <Logo
+                        src={
+                            service.logoUrl && service.logoUrl !== ''
+                                ? service.logoUrl
+                                : '/images/cloverlogo.png' // 직접 등록한 경우 기본 로고
+                        }
+                        alt={service.name}
+                    />
                     </a>
-                    {/* 🌟 [중간시연용 코드 끝] */}
                     <TextBox>
                         <ServiceName>{service.name}</ServiceName>
                         <ServicePrice>
-                            {service.price} / {service.period}
+                            {service.price}
+                            {service.priceUnit === '$' ? '달러' : '원'} / {service.period}
                         </ServicePrice>
                     </TextBox>
                     <Dday>D-{service.dday}</Dday>

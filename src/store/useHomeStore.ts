@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import axios from '../api/axiosInstance';
-import type { SubscribeData } from '@/types/subscribe';
+import type { SubscribeData } from '../types/subscribe';
+import type { SubscribeDatas } from '../api/subscribe';
 import type { Service } from '@/types/service';
 
 type HomeState = {
@@ -32,19 +33,36 @@ export const useHomeStore = create<HomeState>((set, get) => ({
         try {
             const category = get().selectedCategory;
 
-            // 🔀 API 경로 분기
-            const url = category === '전체보기'
-                ? '/subscribe/list'
-                : `/subscribe/list/category/${categoryToNo(category)}`;
+            let allData: SubscribeData[] = [];
+            let monthly = 0;
+            let yearly = 0;
 
-            const { data } = await axios.get<{
-                subscribeList: SubscribeData[];
-            }>(url);
+            if (category === '전체보기') {
+                const res = await axios.get<SubscribeDatas>('/subscribe/list');
+                allData = res.data.subscribeList;
+                monthly = res.data.monthlyTotalPrice;
+                yearly = res.data.yearlyTotalPrice;
+            } else if (category === '기타') {
+                const [etcRes, deliveryRes] = await Promise.all([
+                    axios.get<SubscribeDatas>('/subscribe/list/category/7'),
+                    axios.get<SubscribeDatas>('/subscribe/list/category/3'),
+                ]);
+                allData = [...etcRes.data.subscribeList, ...deliveryRes.data.subscribeList];
+                monthly = etcRes.data.monthlyTotalPrice + deliveryRes.data.monthlyTotalPrice;
+                yearly = etcRes.data.yearlyTotalPrice + deliveryRes.data.yearlyTotalPrice;
+            } else {
+                const categoryNo = categoryToNo(category);
+                const res = await axios.get<SubscribeDatas>(`/subscribe/list/category/${categoryNo}`);
+                allData = res.data.subscribeList;
+                monthly = res.data.monthlyTotalPrice;
+                yearly = res.data.yearlyTotalPrice;
+            }
 
-            const parsed: Service[] = data.subscribeList.map((item, index) => ({
+            const parsed: Service[] = allData.map((item, index) => ({
                 id: item.subscribeNo || index,
                 name: item.subscribeName,
                 price: item.price.toLocaleString(),
+                priceUnit: item.priceUnit,
                 billingType: item.periodUnit,
                 dday: item.dday?.toString() || '0',
                 logoUrl: item.image || '',
@@ -52,40 +70,27 @@ export const useHomeStore = create<HomeState>((set, get) => ({
                 category: item.categoryNo?.toString() || '기타',
             }));
 
-            const monthlyOnly = parsed.filter(s => s.billingType === '달');
-            const yearlyOnly = parsed.filter(s => s.billingType === '년');
-
-            const totalMonthly = monthlyOnly.reduce((sum, s) => {
-                const price = parseInt(s.price.replace(/[^0-9]/g, ''), 10);
-                return sum + price;
-            }, 0);
-
-            const totalYearly = yearlyOnly.reduce((sum, s) => {
-                const price = parseInt(s.price.replace(/[^0-9]/g, ''), 10);
-                return sum + price;
-            }, 0);
-
             set({
                 services: parsed,
-                monthlyCost: totalMonthly,
-                yearlyCost: totalYearly,
+                monthlyCost: monthly,
+                yearlyCost: yearly,
             });
-
         } catch (err) {
             console.error('fetchHomeData error:', err);
         }
-    }
+    },
 }));
 
 // 🔧 카테고리 이름 → 번호 변환 함수
 function categoryToNo(name: string): number {
     const map: Record<string, number> = {
-        음악: 1,
-        OTT: 2,
-        툴: 3,
-        AI: 4,
-        클라우드: 5,
-        기타: 6,
+        OTT: 1,
+        음악: 2,
+        '배달/배송': 3,
+        클라우드: 4,
+        AI: 5,
+        툴: 6,
+        기타: 7, // 기본 기타는 7번
     };
     return map[name] ?? 0;
 }

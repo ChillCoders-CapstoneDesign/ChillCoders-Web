@@ -39,4 +39,5 @@ const LayoutWrapper = styled.div`
 const MainContent = styled.main`
     flex: 1;
     padding-bottom: var(--bottom-tab-height);
+    overflow-y: auto;
 `;

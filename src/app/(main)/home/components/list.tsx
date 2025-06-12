@@ -2,20 +2,22 @@
 
 import styled from 'styled-components';
 import { useHomeStore } from '../../../../store/useHomeStore';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ListComponent from './ListComponent';
 import { TEXT_COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/font';
 
 const List = () => {
-    const { services } = useHomeStore();
+    const { services } = useHomeStore(); // ✅ Zustand store 사용
     const [sortBy, setSortBy] = useState<'date' | 'price'>('date');
 
     const sortedServices = [...services].sort((a, b) => {
         if (sortBy === 'date') {
             return Number(a.dday) - Number(b.dday);
         } else {
-            return parseFloat(b.price.replace(/[^\d.-]+/g, '')) - parseFloat(a.price.replace(/[^\d.-]+/g, ''));
+            const priceA = parseInt(a.price.replace(/[^0-9]/g, ''), 10);
+            const priceB = parseInt(b.price.replace(/[^0-9]/g, ''), 10);
+            return priceB - priceA;
         }
     });
 
