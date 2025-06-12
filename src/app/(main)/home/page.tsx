@@ -32,5 +32,4 @@ const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-bottom: 6rem; /* BottomTab 높이만큼 패딩 추가 -> 없으면 리스트 많을시 BottomTab 뒤에 리스트 쌓임*/
 `;

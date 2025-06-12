@@ -54,6 +54,7 @@ const GlobalStyle = createGlobalStyle`
         height: 100%;
         min-height: 100vh;
         width: 100%;
+        overflow: hidden; /* ✅ body에 스크롤 생기지 않게 설정 */
     }
 
     body {

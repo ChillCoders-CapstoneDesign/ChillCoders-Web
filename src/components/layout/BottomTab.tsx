@@ -1,6 +1,8 @@
 // src/components/layout/BottomTab.tsx
 'use client';
 
+'use client';
+
 import Link from 'next/link';
 import styled from 'styled-components';
 import { HomeFilled, PlusCircleOutlined } from '@ant-design/icons';
@@ -16,16 +18,20 @@ const BottomTab = ({ currentPath }: BottomTabProps) => {
 
     return (
         <TabWrapper>
-            <TabItem>
-                <Link href="/home">
-                    <HomeFilled style={{ fontSize: 35, color: COLORS.main }} />
-                </Link>
-            </TabItem>
-            <TabItem>
-                <Link href="/register">
-                    <PlusCircleOutlined style={{ fontSize: 35, color: COLORS.main }} />
-                </Link>
-            </TabItem>
+            {isHome && (
+                <TabItem>
+                    <Link href="/register">
+                        <PlusCircleOutlined style={{ fontSize: 35, color: COLORS.main }} />
+                    </Link>
+                </TabItem>
+            )}
+            {isRegister && (
+                <TabItem>
+                    <Link href="/home">
+                        <HomeFilled style={{ fontSize: 35, color: COLORS.main }} />
+                    </Link>
+                </TabItem>
+            )}
         </TabWrapper>
     );
 };
@@ -43,7 +49,7 @@ const TabWrapper = styled.div`
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
     background-color: white;
     border-top: 1px solid #eee;

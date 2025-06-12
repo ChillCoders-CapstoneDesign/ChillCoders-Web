@@ -1,71 +1,41 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
-import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import axios from '@/api/axiosInstance';
 import { COLORS, TEXT_COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/font';
-import backIcon from '../../../assets/icons/back-icon.png';
-
-interface SubscribeDetail {
-    subscribeName: string;
-    image: string;
-    price: number;
-    priceUnit: string;
-    period: number;
-    periodUnit: string;
-    startDate: string;
-    passedMonth: number;
-    categoryNo: number; // ✅ 추가
-}
+import backIcon from '../../../assets/icons/back-icon.png'; // ⬅️ "뒤로가기"용 이미지만 유지
+import Image from 'next/image';
 
 const PRICE_UNITS = ['원', '달러'];
 const PERIOD_UNITS = ['달', '년'];
+const CATEGORY_OPTIONS: { name: string; value: number }[] = [
+    { name: '음악', value: 2 },
+    { name: 'OTT', value: 1 },
+    { name: '툴', value: 6 },
+    { name: 'AI', value: 5 },
+    { name: '클라우드', value: 4 },
+    { name: '기타', value: 7 },
+];
 
-export default function EditPage() {
+export default function EditFirsthandPage() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const id = searchParams.get('subscribeNo');
-
-    const [data, setData] = useState<SubscribeDetail | null>(null);
-    const [price, setPrice] = useState('');
-    const [priceUnit, setPriceUnit] = useState('');
-    const [period, setPeriod] = useState('');
-    const [periodUnit, setPeriodUnit] = useState('');
-    const [startDate, setStartDate] = useState('');
+    const [name, setName] = useState('');
+    const [price, setPrice] = useState('0');
+    const [priceUnit, setPriceUnit] = useState('원');
+    const [period, setPeriod] = useState('1');
+    const [periodUnit, setPeriodUnit] = useState('달');
+    const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
     const [passedMonth, setPassedMonth] = useState(0);
-
-    useEffect(() => {
-        if (!id) return;
-
-        axios
-            .get(`/subscribe/${id}`)
-            .then((res) => {
-                const fetched = res.data;
-                setData(fetched);
-                setPrice(fetched.price.toString());
-                setPriceUnit(fetched.priceUnit);
-                setPeriod(fetched.period.toString());
-                setPeriodUnit(fetched.periodUnit);
-                setStartDate(fetched.startDate);
-                setPassedMonth(calculatePassedMonth(fetched.startDate));
-            })
-            .catch((err) => {
-                console.error('❌ 구독 정보 불러오기 실패:', err);
-                alert('잘못된 접근입니다.');
-                router.push('/home');
-            });
-    }, [id]);
+    const [categoryNo, setCategoryNo] = useState<number>(7); // 기타의 value
 
     const calculatePassedMonth = (start: string) => {
         const startDt = new Date(start);
         const today = new Date();
-
         let months = (today.getFullYear() - startDt.getFullYear()) * 12 + (today.getMonth() - startDt.getMonth());
         if (today.getDate() < startDt.getDate()) months -= 1;
-
         return Math.max(0, months);
     };
 
@@ -73,20 +43,20 @@ export default function EditPage() {
 
     const handleSave = async () => {
         try {
-            await axios.put(`/subscribe/${id}`, {
-                name: data?.subscribeName,
-                image: data?.image,
+            await axios.post('/subscribe/create', {
+                name,
+                image: '', // 이미지 없음
                 price: parseInt(price.replace(/,/g, '')) || 0,
-                priceUnit: priceUnit || '원',
+                priceUnit: priceUnit === '달러' ? '$' : priceUnit,
                 period: parseInt(period) || 1,
-                periodUnit: periodUnit || '달',
-                startDate: startDate || '2025-01-01',
-                categoryNo: data?.categoryNo ?? 0,
+                periodUnit,
+                startDate,
+                categoryNo: categoryNo ?? 0,
             });
             router.push('/home');
         } catch (err) {
-            console.error('❌ 저장 실패:', err);
-            alert('수정에 실패했습니다.');
+            console.error('❌ 생성 실패:', err);
+            alert('저장에 실패했습니다.');
         }
     };
 
@@ -96,15 +66,6 @@ export default function EditPage() {
         setPassedMonth(calculatePassedMonth(newDate));
     };
 
-    const getResolvedImageUrl = (img: string) => {
-        if (!img || img === 'null' || img.trim() === '') return null;
-        if (img.startsWith('http')) return img;
-        return `https://your-temp-domain.com/${img}`;
-    };
-
-    if (!id) return <div>잘못된 접근입니다. (id 없음)</div>;
-    if (!data) return <div>구독 정보를 불러오고 있습니다...</div>;
-
     return (
         <Container>
             <TopBar>
@@ -113,32 +74,19 @@ export default function EditPage() {
                 </BackButton>
             </TopBar>
 
-            {getResolvedImageUrl(data.image) ? (
-                <Image
-                    src={getResolvedImageUrl(data.image)!}
-                    alt={data.subscribeName}
-                    width={170}
-                    height={170}
-                    style={{ borderRadius: '1rem', objectFit: 'cover' }}
-                />
-            ) : null}
-            <ServiceName>{data.subscribeName}</ServiceName>
-
             <InputGroup>
+                <Label>서비스 이름</Label>
+                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="서비스 이름을 입력하세요" />
+
                 <Label>구독 요금</Label>
                 <Row>
                     <Input value={price} onChange={(e) => setPrice(e.target.value)} />
                     <Select
                         value={priceUnit === '$' ? '달러' : priceUnit}
-                        onChange={(e) => {
-                            const selected = e.target.value;
-                            setPriceUnit(selected === '달러' ? '$' : selected);
-                        }}
+                        onChange={(e) => setPriceUnit(e.target.value === '달러' ? '$' : e.target.value)}
                     >
                         {PRICE_UNITS.map((unit) => (
-                            <option key={unit} value={unit}>
-                                {unit}
-                            </option>
+                            <option key={unit} value={unit}>{unit}</option>
                         ))}
                     </Select>
                 </Row>
@@ -158,6 +106,17 @@ export default function EditPage() {
 
                 <Label>구독 중인 개월 수</Label>
                 <Input value={`${passedMonth}개월간 구독중`} readOnly />
+
+                <Label>카테고리</Label>
+                <Select
+                    value={categoryNo}
+                    onChange={(e) => setCategoryNo(parseInt(e.target.value))}
+                >
+                    <option value="" disabled>카테고리를 선택하세요</option>
+                    {CATEGORY_OPTIONS.map((cat) => (
+                        <option key={cat.value} value={cat.value}>{cat.name}</option>
+                    ))}
+                </Select>
             </InputGroup>
 
             <SaveButton onClick={handleSave}>저장하기</SaveButton>
@@ -165,7 +124,8 @@ export default function EditPage() {
     );
 }
 
-// 스타일링
+// ------------------ 스타일 ------------------
+
 const Container = styled.div`
     display: flex;
     flex-direction: column;
