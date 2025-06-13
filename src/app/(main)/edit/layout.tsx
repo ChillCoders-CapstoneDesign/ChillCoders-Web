@@ -14,14 +14,14 @@ export default function EditLayout({ children }: PropsWithChildren) {
 }
 
 const LayoutWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
     height: 100vh;
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
     background-color: ${COLORS.white};
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem 1rem 2rem;
+    position: relative;
 
     @media (max-width: 430px) {
         max-width: 100%;

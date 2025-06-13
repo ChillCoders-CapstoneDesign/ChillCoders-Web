@@ -8,6 +8,7 @@ import { FONTS } from '@/constants/font';
 import { useHomeStore } from '@/store/useHomeStore';
 import { useRouter } from 'next/navigation'; // 시연용 추가
 import axios from '@/api/axiosInstance';
+import { formatPrice } from '../../../../utils/formatPrice';
 
 interface Props {
     service: {
@@ -128,10 +129,9 @@ const ListComponent = ({ service }: Props) => {
                     </a>
                     <TextBox>
                         <ServiceName>{service.name}</ServiceName>
-                        <ServicePrice>
-                            {service.price}
-                            {service.priceUnit === '$' ? '달러' : '원'} / {service.period}
-                        </ServicePrice>
+                    <ServicePrice>
+                        {formatPrice(service.price, service.priceUnit)} / {service.period}
+                    </ServicePrice>
                     </TextBox>
                     <Dday>D-{service.dday}</Dday>
                 </Content>
@@ -179,16 +179,16 @@ const Content = styled.div<{ $showDelete: boolean }>`
 `;
 
 const Logo = styled.img`
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     object-fit: contain;
     border-radius: 50%;
     background-color: #ccc;
+    margin-right: 1.2rem;
 `;
 
 const TextBox = styled.div`
     flex: 1;
-    margin-left: 1rem;
 `;
 
 const ServiceName = styled.div`

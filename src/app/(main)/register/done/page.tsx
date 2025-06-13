@@ -75,7 +75,8 @@ export default function RegisterDonePage() {
 }
 
 const Container = styled.div`
-    padding: 1.5rem 1rem 2rem;
+    display: flex;
+    flex-direction: column;
     height: 100vh;
     background-color: ${COLORS.white};
 `;
@@ -83,21 +84,29 @@ const Container = styled.div`
 const TopBar = styled.div`
     display: flex;
     align-items: center;
-    margin-bottom: 2rem;
+    height: 4.5rem;
+
 `;
 
 const BackButton = styled.button`
     background: none;
     border: none;
-    padding: 0;
+    padding-top: 1rem;
+    padding-left: 1rem;
     cursor: pointer;
 `;
 
 const Content = styled.div`
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
     gap: 2rem;
     align-items: center;
+    width: 100%;
+    max-width: 480px;
 `;
 
 const Message = styled.div`

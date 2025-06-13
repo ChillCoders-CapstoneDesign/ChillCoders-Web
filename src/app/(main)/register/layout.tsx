@@ -27,8 +27,8 @@ const LayoutWrapper = styled.div`
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
-    position: relative;
     background-color: ${COLORS.white};
+    position: relative;
 
     --bottom-tab-height: 4.25rem;
 
@@ -39,6 +39,5 @@ const LayoutWrapper = styled.div`
 
 const MainContent = styled.main`
     flex: 1;
-    padding-bottom: var(--bottom-tab-height);
     overflow-y: auto;
 `;
