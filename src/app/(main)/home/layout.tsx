@@ -38,6 +38,17 @@ const LayoutWrapper = styled.div`
 
 const MainContent = styled.main`
     flex: 1;
-    padding-bottom: var(--bottom-tab-height);
+    padding-bottom: calc(var(--bottom-tab-height));
     overflow-y: auto;
+
+    /* 스크롤 바 숨기기 */
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Firefox용 */
+    scrollbar-width: none;
+
+    /* Edge, IE용 (optional) */
+    -ms-overflow-style: none;
 `;
