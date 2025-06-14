@@ -2,21 +2,34 @@
 
 import styled from 'styled-components';
 import { useHomeStore } from '../../../../store/useHomeStore';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ListComponent from './ListComponent';
 import { TEXT_COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/font';
 
+const USD_TO_KRW = 1350; // 💱 환율 (고정값, 필요 시 API로 대체 가능)
+
+const normalizeUnit = (unit: string): '₩' | '$' => {
+    if (unit.includes('$') || unit.toLowerCase().includes('usd')) return '$';
+    return '₩';
+};
+
+const getPriceInKRW = (price: string, unit: string): number => {
+    const num = parseInt(price.replace(/[^0-9]/g, ''), 10);
+    const normalized = normalizeUnit(unit);
+    return normalized === '$' ? num * USD_TO_KRW : num;
+};
+
 const List = () => {
-    const { services } = useHomeStore(); // ✅ Zustand store 사용
+    const { services } = useHomeStore();
     const [sortBy, setSortBy] = useState<'date' | 'price'>('date');
 
     const sortedServices = [...services].sort((a, b) => {
         if (sortBy === 'date') {
             return Number(a.dday) - Number(b.dday);
         } else {
-            const priceA = parseInt(a.price.replace(/[^0-9]/g, ''), 10);
-            const priceB = parseInt(b.price.replace(/[^0-9]/g, ''), 10);
+            const priceA = getPriceInKRW(a.price, a.priceUnit);
+            const priceB = getPriceInKRW(b.price, b.priceUnit);
             return priceB - priceA;
         }
     });
@@ -40,6 +53,8 @@ const List = () => {
 };
 
 export default List;
+
+// ---------- 스타일 ----------
 
 const Wrapper = styled.div`
     width: 100%;

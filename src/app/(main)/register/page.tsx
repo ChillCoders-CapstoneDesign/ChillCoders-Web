@@ -88,7 +88,7 @@ export default function RegisterPage() {
                         )}
                         {showRegisterSelf && (
                             <RegisterSelf onClick={() => router.push('/edit-firsthand')}>
-                                … 직접 등록하기
+                                직접 등록하기
                             </RegisterSelf>
                         )}
                     </DynamicContent>

@@ -13,7 +13,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { DatePickerSizeOverride } from '../../../styles/globalStyles';
 import type { DatePickerProps } from 'react-datepicker';
 
-const PRICE_UNITS = ['원', '달러'];
+const PRICE_UNITS = ['₩', '$'];
 const PERIOD_UNITS = ['달', '년'];
 const CATEGORY_OPTIONS: { name: string; value: number }[] = [
     { name: '음악', value: 2 },
@@ -28,7 +28,7 @@ export default function EditFirsthandPage() {
     const router = useRouter();
     const [name, setName] = useState('');
     const [price, setPrice] = useState('0');
-    const [priceUnit, setPriceUnit] = useState('원');
+    const [priceUnit, setPriceUnit] = useState('₩');
     const [period, setPeriod] = useState('1');
     const [periodUnit, setPeriodUnit] = useState('달');
     const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
@@ -52,7 +52,7 @@ export default function EditFirsthandPage() {
                 name,
                 image: '',
                 price: parseInt(price.replace(/,/g, '')) || 0,
-                priceUnit: priceUnit === '달러' ? '$' : priceUnit,
+                priceUnit: priceUnit === '₩' ? '원' : '$',
                 period: parseInt(period) || 1,
                 periodUnit,
                 startDate,
@@ -96,14 +96,14 @@ export default function EditFirsthandPage() {
                     <Label>구독 요금</Label>
                     <Row>
                         <Input value={price} onChange={(e) => setPrice(e.target.value)} />
-                        <Select
-                            value={priceUnit === '$' ? '달러' : priceUnit}
-                            onChange={(e) => setPriceUnit(e.target.value === '달러' ? '$' : e.target.value)}
-                        >
-                            {PRICE_UNITS.map((unit) => (
-                                <option key={unit} value={unit}>{unit}</option>
-                            ))}
-                        </Select>
+                    <Select
+                        value={priceUnit}
+                        onChange={(e) => setPriceUnit(e.target.value)}
+                    >
+                        {PRICE_UNITS.map((unit) => (
+                            <option key={unit} value={unit}>{unit}</option>
+                        ))}
+                    </Select>
                     </Row>
 
                     <Label>구독 주기</Label>
