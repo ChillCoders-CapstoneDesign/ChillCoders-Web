@@ -132,6 +132,7 @@ const ListComponent = ({ service }: Props) => {
                         />
                     </a>
                     <TextBox>
+                        <ServiceName>{service.name}</ServiceName>
                         <ServicePrice>
                             {formatPrice(service.price, service.priceUnit)} /{' '}
                             {['달', '년'].includes(service.billingType)
