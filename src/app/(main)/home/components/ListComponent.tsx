@@ -134,7 +134,7 @@ const ListComponent = ({ service }: Props) => {
                     <TextBox>
                         <ServiceName>{service.name}</ServiceName>
                         <ServicePrice>
-                            {formatPrice(service.price, service.priceUnit)} /{' '}
+                            {formatPrice(service.price, service.priceUnit === '₩' ? '원' : service.priceUnit)} /{' '}                            
                             {['달', '년'].includes(service.billingType)
                                 ? `${parseInt(service.period)}${service.billingType} 단위`
                                 : `${service.period.trim()} ${service.billingType} 구독제`}
