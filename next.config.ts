@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: ['url.kr', 'your-temp-domain.com', 'buly.kr'], // 여기에 필요한 도메인 추가
+  },
 };
 
 export default nextConfig;

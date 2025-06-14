@@ -54,6 +54,7 @@ const GlobalStyle = createGlobalStyle`
         height: 100%;
         min-height: 100vh;
         width: 100%;
+        overflow: hidden; /* ✅ body에 스크롤 생기지 않게 설정 */
     }
 
     body {
@@ -106,6 +107,45 @@ const GlobalStyle = createGlobalStyle`
         padding: 0 var(--horizontal-padding);
     }
 
+`;
+
+export const DatePickerSizeOverride = createGlobalStyle`
+    .react-datepicker {
+        font-size: 1.1rem;
+    }
+
+    .react-datepicker-popper {
+        transform: translate(2rem, -26rem) !important;
+        left: 0 !important;
+        top: auto !important;
+        z-index: 9999 !important;
+        position: absolute;
+    }
+
+
+    .react-datepicker__month-container {
+        width: 20rem; /* ✅ 같이 넓히기 */
+    }
+
+    .react-datepicker__header {
+        padding-top: 2rem;
+    }
+
+    .react-datepicker__current-month {
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
+    .react-datepicker__day-name,
+    .react-datepicker__day,
+    .react-datepicker__portal .react-datepicker__day-name,
+    .react-datepicker__portal .react-datepicker__day {
+        width: 2.8rem !important;
+        line-height: 2.8rem !important;
+        box-sizing: border-box;
+        margin: 0;
+        text-align: center;
+    }
 `;
 
 export default GlobalStyle;
