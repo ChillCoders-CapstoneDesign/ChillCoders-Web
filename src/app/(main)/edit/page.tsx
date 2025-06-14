@@ -1,8 +1,12 @@
-// src/app/(main)/edit/page.tsx
-'use client'; // 👈 클라이언트 컴포넌트로 선언
+'use client';
 
+import { Suspense } from 'react';
 import EditClient from './EditClient';
 
 export default function EditPage() {
-    return <EditClient />;
+    return (
+        <Suspense fallback={<div>로딩 중...</div>}>
+            <EditClient />
+        </Suspense>
+    );
 }
