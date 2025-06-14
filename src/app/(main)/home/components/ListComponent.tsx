@@ -111,9 +111,13 @@ const ListComponent = ({ service }: Props) => {
                         />
                     </a>
                     <TextBox>
-                        <ServiceName>{service.name}</ServiceName>
                         <ServicePrice>
                             {formatPrice(service.price, service.priceUnit)} / {service.period}
+                            {service.billingType === '달'
+                                ? ' 마다'
+                                : service.billingType === '년'
+                                ? ' 마다'
+                                : ` ${service.billingType} 구독제`}
                         </ServicePrice>
                     </TextBox>
                     <Dday>D-{service.dday}</Dday>
