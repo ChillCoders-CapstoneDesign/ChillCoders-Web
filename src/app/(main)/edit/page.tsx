@@ -26,7 +26,7 @@ interface SubscribeDetail {
     categoryNo: number;
 }
 
-const PRICE_UNITS = ['원', '달러'];
+const PRICE_UNITS = ['₩', '$'];
 const PERIOD_UNITS = ['달', '년'];
 
 export default function EditPage() {

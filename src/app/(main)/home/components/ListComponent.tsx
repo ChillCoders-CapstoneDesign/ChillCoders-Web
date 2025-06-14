@@ -6,9 +6,10 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { COLORS, TEXT_COLORS } from '@/constants/colors';
 import { FONTS } from '@/constants/font';
 import { useHomeStore } from '@/store/useHomeStore';
-import { useRouter } from 'next/navigation'; // 시연용 추가
+import { useRouter } from 'next/navigation';
 import axios from '@/api/axiosInstance';
-import { formatPrice } from '../../../../utils/formatPrice';
+import { formatPrice } from '@/utils/formatPrice';
+import { serviceLoginLinks } from '@/constants/serviceLinks';
 
 interface Props {
     service: {
@@ -28,46 +29,36 @@ const ListComponent = ({ service }: Props) => {
     const touchStartX = useRef(0);
     const mouseStartX = useRef(0);
     const { setServices, services, setCosts } = useHomeStore();
-    const router = useRouter(); // 시연용 추가
+    const router = useRouter();
 
-    // 터치 이벤트
+    const loginUrl = serviceLoginLinks[service.name.trim()];
+
     const handleTouchStart = (e: React.TouchEvent) => {
         touchStartX.current = e.touches[0].clientX;
     };
 
     const handleTouchEnd = (e: React.TouchEvent) => {
         const diff = touchStartX.current - e.changedTouches[0].clientX;
-        if (diff > 30) {
-            setShowDelete(true); // 왼쪽으로 스와이프 → 삭제 버튼 보이기
-        } else if (diff < -30) {
-            setShowDelete(false); // 오른쪽으로 스와이프 → 숨기기
-        }
+        if (diff > 30) setShowDelete(true);
+        else if (diff < -30) setShowDelete(false);
     };
 
-    // 마우스 이벤트
     const handleMouseDown = (e: React.MouseEvent) => {
         mouseStartX.current = e.clientX;
     };
 
     const handleMouseUp = (e: React.MouseEvent) => {
         const diff = mouseStartX.current - e.clientX;
-        if (diff > 30) {
-            setShowDelete(true);
-        } else if (diff < -30) {
-            setShowDelete(false);
-        }
+        if (diff > 30) setShowDelete(true);
+        else if (diff < -30) setShowDelete(false);
     };
 
     const handleDelete = async () => {
         try {
-            // 1. 서버에 DELETE 요청
             await axios.delete(`/subscribe/${service.id}`);
-
-            // 2. 상태에서 제거
             const updated = services.filter((s) => s.id !== service.id);
             setServices(updated);
 
-            // 3. 비용 재계산
             const totalMonthly = updated.reduce((sum, s) => {
                 const price = parseInt(s.price.replace(/[^0-9]/g, ''), 10);
                 return sum + (s.billingType === '달' ? price : 0);
@@ -79,17 +70,15 @@ const ListComponent = ({ service }: Props) => {
             }, 0);
 
             setCosts(totalMonthly, totalYearly);
-
         } catch (err) {
             console.error('❌ 삭제 실패:', err);
             alert('삭제 중 오류가 발생했습니다.');
         }
     };
 
-
     const handleClick = () => {
         if (!showDelete) {
-            router.push(`/edit?subscribeNo=${service.id}`);  // ✅ 서비스 ID를 쿼리로 넘김
+            router.push(`/edit?subscribeNo=${service.id}`);
         }
     };
 
@@ -103,35 +92,29 @@ const ListComponent = ({ service }: Props) => {
                     onTouchEnd={handleTouchEnd}
                     onMouseDown={handleMouseDown}
                     onMouseUp={handleMouseUp}
-                >   
+                >
                     <a
-                        href={
-                            service.name.toLowerCase() === 'netflix premium'
-                                ? 'https://www.netflix.com/login'
-                                : undefined
-                        }
+                        href={loginUrl || undefined}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => {
-                            if (service.name.toLowerCase() === 'netflix premium') {
-                                e.stopPropagation(); // 카드 클릭(router.push('/edit')) 방지
-                            }
+                            if (loginUrl) e.stopPropagation();
                         }}
                     >
-                    <Logo
-                        src={
-                            service.logoUrl && service.logoUrl !== ''
-                                ? service.logoUrl
-                                : '/images/cloverlogo.png' // 직접 등록한 경우 기본 로고
-                        }
-                        alt={service.name}
-                    />
+                        <Logo
+                            src={
+                                service.logoUrl && service.logoUrl !== ''
+                                    ? service.logoUrl
+                                    : '/images/cloverlogo.png'
+                            }
+                            alt={service.name}
+                        />
                     </a>
                     <TextBox>
                         <ServiceName>{service.name}</ServiceName>
-                    <ServicePrice>
-                        {formatPrice(service.price, service.priceUnit)} / {service.period}
-                    </ServicePrice>
+                        <ServicePrice>
+                            {formatPrice(service.price, service.priceUnit)} / {service.period}
+                        </ServicePrice>
                     </TextBox>
                     <Dday>D-{service.dday}</Dday>
                 </Content>
@@ -147,8 +130,6 @@ const ListComponent = ({ service }: Props) => {
 };
 
 export default ListComponent;
-
-// ------------------ 스타일 ------------------
 
 const Container = styled.div`
     position: relative;
@@ -173,8 +154,6 @@ const Content = styled.div<{ $showDelete: boolean }>`
     padding: 1rem;
     transform: ${({ $showDelete }) => ($showDelete ? 'translateX(-4rem)' : 'translateX(0)')};
     transition: transform 0.3s ease;
-
-    /* 🌟 [중간시연용] 커서 스타일 이건 시연 끝나고도 놔둬도 될듯 */
     cursor: ${({ $showDelete }) => ($showDelete ? 'default' : 'pointer')};
 `;
 
@@ -205,9 +184,9 @@ const ServicePrice = styled.div`
 const Dday = styled.div`
     background-color: ${COLORS.main};
     color: #fff;
-    padding: 0.5rem 0;          // 좌우 패딩 제거
-    width: 4.5rem;              // 고정 너비 설정 (3자리 숫자 + 여백 감안)
-    text-align: center;         // 가운데 정렬
+    padding: 0.5rem 0;
+    width: 4.5rem;
+    text-align: center;
     border-radius: 20px;
     font-weight: bold;
 `;
