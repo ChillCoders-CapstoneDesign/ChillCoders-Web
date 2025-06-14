@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { fetchNotifications, markAsRead } from '@/api/notification';
-import { toast } from 'react-toastify';
 import { CloseOutlined } from '@ant-design/icons';
+import { useNotificationStore } from '@/store/useNotificationStore'; // ✅ Zustand 전역 상태 동기화용
 
 interface Notification {
     notificationNo: number;
@@ -18,6 +18,7 @@ interface Props {
 
 const NotificationModal = ({ onClose }: Props) => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
+    const { setNotifications: setGlobalNotifications } = useNotificationStore(); // ✅ 전역 상태 업데이트
 
     useEffect(() => {
         const load = async () => {
@@ -28,8 +29,18 @@ const NotificationModal = ({ onClose }: Props) => {
     }, []);
 
     const handleClick = async (noti: Notification) => {
-        await markAsRead(noti.notificationNo); // ✅ 모달에서만 읽음 처리
-        setNotifications(prev => prev.filter(n => n.notificationNo !== noti.notificationNo));
+        await markAsRead(noti.notificationNo);
+        const updated = notifications.filter((n) => n.notificationNo !== noti.notificationNo);
+        setNotifications(updated);
+    };
+
+    const handleCloseButton = () => {
+        if (notifications.length === 0) {
+            setGlobalNotifications([]); // ✅ 전역 상태도 비워야 Summary 빨간 점 사라짐
+            window.location.reload();   // ✅ 전체 새로고침으로 동기화
+        } else {
+            onClose(); // ✅ 모달만 닫기
+        }
     };
 
     return (
@@ -37,7 +48,7 @@ const NotificationModal = ({ onClose }: Props) => {
             <Modal onClick={(e) => e.stopPropagation()}>
                 <Header>
                     <h3>알림</h3>
-                    <CloseOutlined onClick={onClose} />
+                    <CloseOutlined onClick={handleCloseButton} />
                 </Header>
                 <Content>
                     {notifications.length === 0 ? (

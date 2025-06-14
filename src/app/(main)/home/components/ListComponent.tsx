@@ -28,6 +28,7 @@ const ListComponent = ({ service }: Props) => {
     const [showDelete, setShowDelete] = useState(false);
     const touchStartX = useRef(0);
     const mouseStartX = useRef(0);
+    const isAnimating = useRef(false);
     const { setServices, services, setCosts } = useHomeStore();
     const router = useRouter();
 
@@ -39,8 +40,17 @@ const ListComponent = ({ service }: Props) => {
 
     const handleTouchEnd = (e: React.TouchEvent) => {
         const diff = touchStartX.current - e.changedTouches[0].clientX;
-        if (diff > 30) setShowDelete(true);
-        else if (diff < -30) setShowDelete(false);
+        if (diff > 30) {
+            // Left swipe (right to left) → show delete
+            setShowDelete(true);
+            isAnimating.current = true;
+            setTimeout(() => (isAnimating.current = false), 1000);
+        } else if (diff < -30) {
+            // Right swipe (left to right) → hide delete
+            setShowDelete(false);
+            isAnimating.current = true;
+            setTimeout(() => (isAnimating.current = false), 1000);
+        }
     };
 
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -49,8 +59,17 @@ const ListComponent = ({ service }: Props) => {
 
     const handleMouseUp = (e: React.MouseEvent) => {
         const diff = mouseStartX.current - e.clientX;
-        if (diff > 30) setShowDelete(true);
-        else if (diff < -30) setShowDelete(false);
+        if (diff > 30) {
+            // Left swipe (right to left) → show delete
+            setShowDelete(true);
+            isAnimating.current = true;
+            setTimeout(() => (isAnimating.current = false), 1000);
+        } else if (diff < -30) {
+            // Right swipe (left to right) → hide delete
+            setShowDelete(false);
+            isAnimating.current = true;
+            setTimeout(() => (isAnimating.current = false), 1000);
+        }
     };
 
     const handleDelete = async () => {
@@ -76,10 +95,12 @@ const ListComponent = ({ service }: Props) => {
         }
     };
 
-    const handleClick = () => {
-        if (!showDelete) {
-            router.push(`/edit?subscribeNo=${service.id}`);
+    const handleClick = (e: React.MouseEvent) => {
+        if (showDelete || isAnimating.current) {
+            e.stopPropagation(); // Prevent unintended navigation
+            return;
         }
+        router.push(`/edit?subscribeNo=${service.id}`);
     };
 
     return (
@@ -87,7 +108,7 @@ const ListComponent = ({ service }: Props) => {
             <SwipeWrapper>
                 <Content
                     $showDelete={showDelete}
-                    onClick={handleClick}
+                    onClick={(e) => handleClick(e)}
                     onTouchStart={handleTouchStart}
                     onTouchEnd={handleTouchEnd}
                     onMouseDown={handleMouseDown}
@@ -112,12 +133,10 @@ const ListComponent = ({ service }: Props) => {
                     </a>
                     <TextBox>
                         <ServicePrice>
-                            {formatPrice(service.price, service.priceUnit)} / {service.period}
-                            {service.billingType === '달'
-                                ? ' 마다'
-                                : service.billingType === '년'
-                                ? ' 마다'
-                                : ` ${service.billingType} 구독제`}
+                            {formatPrice(service.price, service.priceUnit)} /{' '}
+                            {['달', '년'].includes(service.billingType)
+                                ? `${parseInt(service.period)}${service.billingType} 단위`
+                                : `${service.period.trim()} ${service.billingType} 구독제`}
                         </ServicePrice>
                     </TextBox>
                     <Dday>D-{service.dday}</Dday>
